@@ -1,0 +1,45 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31912.275
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateADotnetRepositoryWithCleanArchitecture.Api", "src\CreateADotnetRepositoryWithCleanArchitecture.Api\CreateADotnetRepositoryWithCleanArchitecture.Api.csproj", "{B1A1C1A1-1A1B-1A1C-1A1D-1A1E1F1A1B1C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateADotnetRepositoryWithCleanArchitecture.Domain", "src\CreateADotnetRepositoryWithCleanArchitecture.Domain\CreateADotnetRepositoryWithCleanArchitecture.Domain.csproj", "{C2B2D2B2-2B2C-2B2D-2B2E-2B2F2G2B2C2D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateADotnetRepositoryWithCleanArchitecture.Application", "src\CreateADotnetRepositoryWithCleanArchitecture.Application\CreateADotnetRepositoryWithCleanArchitecture.Application.csproj", "{D3C3E3C3-3C3D-3C3E-3C3F-3C3G3H3C3D3E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateADotnetRepositoryWithCleanArchitecture.Infrastructure", "src\CreateADotnetRepositoryWithCleanArchitecture.Infrastructure\CreateADotnetRepositoryWithCleanArchitecture.Infrastructure.csproj", "{E4D4F4D4-4D4E-4D4F-4D4G-4D4H4I4D4E4F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreateADotnetRepositoryWithCleanArchitecture.Tests", "tests\CreateADotnetRepositoryWithCleanArchitecture.Tests\CreateADotnetRepositoryWithCleanArchitecture.Tests.csproj", "{F5E5G5E5-5E5F-5E5G-5E5H-5E5I5J5E5F5G}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B1A1C1A1-1A1B-1A1C-1A1D-1A1E1F1A1B1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1A1C1A1-1A1B-1A1C-1A1D-1A1E1F1A1B1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1A1C1A1-1A1B-1A1C-1A1D-1A1E1F1A1B1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1A1C1A1-1A1B-1A1C-1A1D-1A1E1F1A1B1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2B2D2B2-2B2C-2B2D-2B2E-2B2F2G2B2C2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2B2D2B2-2B2C-2B2D-2B2E-2B2F2G2B2C2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2B2D2B2-2B2C-2B2D-2B2E-2B2F2G2B2C2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2B2D2B2-2B2C-2B2D-2B2E-2B2F2G2B2C2D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D3C3E3C3-3C3D-3C3E-3C3F-3C3G3H3C3D3E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D3C3E3C3-3C3D-3C3E-3C3F-3C3G3H3C3D3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D3C3E3C3-3C3D-3C3E-3C3F-3C3G3H3C3D3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D3C3E3C3-3C3D-3C3E-3C3F-3C3G3H3C3D3E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4D4F4D4-4D4E-4D4F-4D4G-4D4H4I4D4E4F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4D4F4D4-4D4E-4D4F-4D4G-4D4H4I4D4E4F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4D4F4D4-4D4E-4D4F-4D4G-4D4H4I4D4E4F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4D4F4D4-4D4E-4D4F-4D4G-4D4H4I4D4E4F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F5E5G5E5-5E5F-5E5G-5E5H-5E5I5J5E5F5G}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F5E5G5E5-5E5F-5E5G-5E5H-5E5I5J5E5F5G}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F5E5G5E5-5E5F-5E5G-5E5H-5E5I5J5E5F5G}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F5E5G5E5-5E5F-5E5G-5E5H-5E5I5J5E5F5G}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
