@@ -1,4 +1,6 @@
-namespace CreateADotnetRepositoryWithCleanArchitecture.Application.DTOs
+using System;
+
+namespace ImplementArticleEntitiy.Application.DTOs
 {
     public record BaseDto
     {
