@@ -6,6 +6,7 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using CreateADotnetRepositoryWithCleanArchitecture.Api.Middlewares;
 using CreateADotnetRepositoryWithCleanArchitecture.Infrastructure;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +20,10 @@ builder.Host.UseSerilog();
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "CreateUserEnityInTheExistingDbContext.Api", Version = "v1" });
+});
 
 // Configure CORS
 builder.Services.AddCors(options =>
@@ -45,18 +49,24 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "CreateUserEnityInTheExistingDbContext.Api v1"));
+}
+else
+{
+    app.UseExceptionHandler("/Error");
+    app.UseHsts();
 }
 
-app.UseSerilogRequestLogging();
-
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-
 app.UseHttpsRedirection();
+
+app.UseRouting();
 
 app.UseCors("AllowAll");
 
 app.UseAuthorization();
+
+// Global exception middleware
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.MapControllers();
 
