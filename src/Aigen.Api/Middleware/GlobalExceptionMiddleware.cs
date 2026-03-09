@@ -1,9 +1,13 @@
 using System.Net;
 using System.Text.Json;
+using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 
-namespace CreateADotnetRepositoryWithCleanArchitecture.Api.Middleware
+namespace ImplementArticleEntitiy.Api.Middleware
 {
     public class GlobalExceptionMiddleware
     {
@@ -30,45 +34,66 @@ namespace CreateADotnetRepositoryWithCleanArchitecture.Api.Middleware
 
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
+            context.Response.ContentType = "application/json";
             var correlationId = context.TraceIdentifier;
-            var statusCode = HttpStatusCode.InternalServerError;
-            var problemDetails = new ProblemDetails
-            {
-                Type = "https://httpstatuses.com/500",
-                Title = "An unexpected error occurred!",
-                Status = (int)statusCode,
-                Detail = exception.Message,
-                Instance = context.Request.Path,
-                Extensions = { { "correlationId", correlationId } }
-            };
+
+            ProblemDetails problemDetails;
+            int statusCode;
 
             switch (exception)
             {
                 case ValidationException validationException:
-                    statusCode = HttpStatusCode.BadRequest;
-                    problemDetails.Type = "https://httpstatuses.com/400";
-                    problemDetails.Title = "Validation error";
-                    problemDetails.Detail = validationException.Message;
+                    statusCode = (int)HttpStatusCode.BadRequest;
+                    problemDetails = new ValidationProblemDetails(new ModelStateDictionary())
+                    {
+                        Status = statusCode,
+                        Title = "Validation Error",
+                        Detail = validationException.Message,
+                        Instance = context.Request.Path,
+                        Extensions = { ["correlationId"] = correlationId }
+                    };
                     break;
-                case NotFoundException notFoundException:
-                    statusCode = HttpStatusCode.NotFound;
-                    problemDetails.Type = "https://httpstatuses.com/404";
-                    problemDetails.Title = "Resource not found";
-                    problemDetails.Detail = notFoundException.Message;
+
+                case NotFoundException:
+                    statusCode = (int)HttpStatusCode.NotFound;
+                    problemDetails = new ProblemDetails
+                    {
+                        Status = statusCode,
+                        Title = "Resource Not Found",
+                        Detail = exception.Message,
+                        Instance = context.Request.Path,
+                        Extensions = { ["correlationId"] = correlationId }
+                    };
                     break;
-                case UnauthorizedAccessException unauthorizedAccessException:
-                    statusCode = HttpStatusCode.Unauthorized;
-                    problemDetails.Type = "https://httpstatuses.com/401";
-                    problemDetails.Title = "Unauthorized access";
-                    problemDetails.Detail = unauthorizedAccessException.Message;
+
+                case UnauthorizedAccessException:
+                    statusCode = (int)HttpStatusCode.Unauthorized;
+                    problemDetails = new ProblemDetails
+                    {
+                        Status = statusCode,
+                        Title = "Unauthorized Access",
+                        Detail = exception.Message,
+                        Instance = context.Request.Path,
+                        Extensions = { ["correlationId"] = correlationId }
+                    };
                     break;
+
                 default:
-                    _logger.LogError(exception, "An unhandled exception occurred. Correlation ID: {CorrelationId}", correlationId);
+                    statusCode = (int)HttpStatusCode.InternalServerError;
+                    problemDetails = new ProblemDetails
+                    {
+                        Status = statusCode,
+                        Title = "An unexpected error occurred",
+                        Detail = exception.Message,
+                        Instance = context.Request.Path,
+                        Extensions = { ["correlationId"] = correlationId }
+                    };
                     break;
             }
 
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)statusCode;
+            _logger.LogError(exception, "Exception caught in GlobalExceptionMiddleware. CorrelationId: {CorrelationId}", correlationId);
+
+            context.Response.StatusCode = statusCode;
             var result = JsonSerializer.Serialize(problemDetails);
             await context.Response.WriteAsync(result);
         }

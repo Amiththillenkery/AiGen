@@ -4,8 +4,9 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using CreateADotnetRepositoryWithCleanArchitecture.Api.Middlewares;
-using CreateADotnetRepositoryWithCleanArchitecture.Infrastructure;
+using ImplementArticleEntity.Api.Middlewares;
+using ImplementArticleEntity.Infrastructure;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,7 +20,10 @@ builder.Host.UseSerilog();
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ImplementArticleEntity API", Version = "v1" });
+});
 
 // Configure CORS
 builder.Services.AddCors(options =>
@@ -32,10 +36,10 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Register services from Infrastructure layer
+// Register application services
 builder.Services.AddInfrastructureServices(builder.Configuration);
 
-// Add health checks
+// Configure health checks
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
@@ -45,22 +49,26 @@ if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ImplementArticleEntity API v1"));
+}
+else
+{
+    app.UseExceptionHandler("/error");
+    app.UseHsts();
 }
 
-app.UseSerilogRequestLogging();
-
-app.UseMiddleware<ExceptionHandlingMiddleware>();
-
 app.UseHttpsRedirection();
-
+app.UseRouting();
 app.UseCors("AllowAll");
-
 app.UseAuthorization();
 
-app.MapControllers();
+// Global exception handling middleware
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
-// Health check endpoint
-app.MapHealthChecks("/health");
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+    endpoints.MapHealthChecks("/health");
+});
 
 app.Run();

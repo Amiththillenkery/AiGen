@@ -2,17 +2,17 @@
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\CreateADotnetRepositoryWithCleanArchitecture.Domain\CreateADotnetRepositoryWithCleanArchitecture.Domain.csproj" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentValidation" Version="11.5.0" />
     <PackageReference Include="AutoMapper" Version="12.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ImplementArticleEntitiy.Domain\ImplementArticleEntitiy.Domain.csproj" />
   </ItemGroup>
 
 </Project>
