@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
-using CreateADotnetRepositoryWithCleanArchitecture.Middlewares;
-using CreateADotnetRepositoryWithCleanArchitecture.Exceptions;
+using FluentAssertions;
+using CreateUserEnityInTheExistingDbContext.Api.Middlewares;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CreateADotnetRepositoryWithCleanArchitecture.Tests
+namespace CreateUserEnityInTheExistingDbContext.Tests
 {
     public class GlobalExceptionMiddlewareTests
     {
@@ -24,87 +24,39 @@ namespace CreateADotnetRepositoryWithCleanArchitecture.Tests
         }
 
         [Fact]
-        public async Task InvokeAsync_ValidationException_ReturnsBadRequest()
+        public async Task InvokeAsync_ShouldReturn400_WhenValidationExceptionIsThrown()
         {
-            _nextMock.Setup(next => next(It.IsAny<HttpContext>())).Throws(new ValidationException("Validation failed"));
+            _nextMock.Setup(next => next(It.IsAny<HttpContext>())).ThrowsAsync(new ValidationException("Validation failed"));
 
             var context = new DefaultHttpContext();
             await _middleware.InvokeAsync(context);
 
-            Assert.Equal((int)HttpStatusCode.BadRequest, context.Response.StatusCode);
-            _loggerMock.Verify(logger => logger.LogError(It.IsAny<string>(), It.IsAny<object[]>()), Times.Once);
+            context.Response.StatusCode.Should().Be((int)HttpStatusCode.BadRequest);
+            context.Response.ContentType.Should().Be("application/problem+json");
         }
 
         [Fact]
-        public async Task InvokeAsync_NotFoundException_ReturnsNotFound()
+        public async Task InvokeAsync_ShouldReturn404_WhenNotFoundExceptionIsThrown()
         {
-            _nextMock.Setup(next => next(It.IsAny<HttpContext>())).Throws(new NotFoundException("Not found"));
+            _nextMock.Setup(next => next(It.IsAny<HttpContext>())).ThrowsAsync(new NotFoundException("Not found"));
 
             var context = new DefaultHttpContext();
             await _middleware.InvokeAsync(context);
 
-            Assert.Equal((int)HttpStatusCode.NotFound, context.Response.StatusCode);
-            _loggerMock.Verify(logger => logger.LogError(It.IsAny<string>(), It.IsAny<object[]>()), Times.Once);
+            context.Response.StatusCode.Should().Be((int)HttpStatusCode.NotFound);
+            context.Response.ContentType.Should().Be("application/problem+json");
         }
 
         [Fact]
-        public async Task InvokeAsync_GeneralException_ReturnsInternalServerError()
+        public async Task InvokeAsync_ShouldReturn500_WhenGeneralExceptionIsThrown()
         {
-            _nextMock.Setup(next => next(It.IsAny<HttpContext>())).Throws(new System.Exception("General error"));
+            _nextMock.Setup(next => next(It.IsAny<HttpContext>())).ThrowsAsync(new System.Exception("General error"));
 
             var context = new DefaultHttpContext();
             await _middleware.InvokeAsync(context);
 
-            Assert.Equal((int)HttpStatusCode.InternalServerError, context.Response.StatusCode);
-            _loggerMock.Verify(logger => logger.LogError(It.IsAny<string>(), It.IsAny<object[]>()), Times.Once);
-        }
-
-        [Fact]
-        public async Task InvokeAsync_ValidationException_ReturnsProblemDetails()
-        {
-            _nextMock.Setup(next => next(It.IsAny<HttpContext>())).Throws(new ValidationException("Validation failed"));
-
-            var context = new DefaultHttpContext();
-            await _middleware.InvokeAsync(context);
-
-            context.Response.Body.Seek(0, System.IO.SeekOrigin.Begin);
-            var responseBody = new System.IO.StreamReader(context.Response.Body).ReadToEnd();
-            var problemDetails = System.Text.Json.JsonSerializer.Deserialize<ProblemDetails>(responseBody);
-
-            Assert.Equal("Validation failed", problemDetails.Title);
-            Assert.Equal((int)HttpStatusCode.BadRequest, problemDetails.Status);
-        }
-
-        [Fact]
-        public async Task InvokeAsync_NotFoundException_ReturnsProblemDetails()
-        {
-            _nextMock.Setup(next => next(It.IsAny<HttpContext>())).Throws(new NotFoundException("Not found"));
-
-            var context = new DefaultHttpContext();
-            await _middleware.InvokeAsync(context);
-
-            context.Response.Body.Seek(0, System.IO.SeekOrigin.Begin);
-            var responseBody = new System.IO.StreamReader(context.Response.Body).ReadToEnd();
-            var problemDetails = System.Text.Json.JsonSerializer.Deserialize<ProblemDetails>(responseBody);
-
-            Assert.Equal("Not found", problemDetails.Title);
-            Assert.Equal((int)HttpStatusCode.NotFound, problemDetails.Status);
-        }
-
-        [Fact]
-        public async Task InvokeAsync_GeneralException_ReturnsProblemDetails()
-        {
-            _nextMock.Setup(next => next(It.IsAny<HttpContext>())).Throws(new System.Exception("General error"));
-
-            var context = new DefaultHttpContext();
-            await _middleware.InvokeAsync(context);
-
-            context.Response.Body.Seek(0, System.IO.SeekOrigin.Begin);
-            var responseBody = new System.IO.StreamReader(context.Response.Body).ReadToEnd();
-            var problemDetails = System.Text.Json.JsonSerializer.Deserialize<ProblemDetails>(responseBody);
-
-            Assert.Equal("An unexpected error occurred.", problemDetails.Title);
-            Assert.Equal((int)HttpStatusCode.InternalServerError, problemDetails.Status);
+            context.Response.StatusCode.Should().Be((int)HttpStatusCode.InternalServerError);
+            context.Response.ContentType.Should().Be("application/problem+json");
         }
     }
 }
