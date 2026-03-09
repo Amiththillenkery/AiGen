@@ -1,18 +1,18 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using System.Net;
-using System.Text.Json;
 
-namespace CreateADotnetRepositoryWithCleanArchitecture.Api.Middleware
+namespace CreateUserEnityInTheExistingDbContext.Api.Middleware
 {
     public static class ExceptionMiddlewareExtensions
     {
         public static void UseGlobalExceptionMiddleware(this IApplicationBuilder app)
         {
-            app.UseExceptionHandler(errorApp =>
+            app.UseExceptionHandler(appError =>
             {
-                errorApp.Run(async context =>
+                appError.Run(async context =>
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                     context.Response.ContentType = "application/json";
@@ -20,15 +20,14 @@ namespace CreateADotnetRepositoryWithCleanArchitecture.Api.Middleware
                     var contextFeature = context.Features.Get<IExceptionHandlerFeature>();
                     if (contextFeature != null)
                     {
-                        var errorResponse = new
+                        var logger = app.ApplicationServices.GetRequiredService<ILogger<ExceptionMiddlewareExtensions>>();
+                        logger.LogError($"Something went wrong: {contextFeature.Error}");
+
+                        await context.Response.WriteAsync(new
                         {
                             StatusCode = context.Response.StatusCode,
-                            Message = "Internal Server Error. Please try again later.",
-                            Detailed = contextFeature.Error.Message
-                        };
-
-                        var jsonResponse = JsonSerializer.Serialize(errorResponse);
-                        await context.Response.WriteAsync(jsonResponse);
+                            Message = "Internal Server Error."
+                        }.ToString());
                     }
                 });
             });
