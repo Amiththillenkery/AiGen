@@ -1,8 +1,10 @@
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using CreateUserEnityInTheExistingDbContext.Infrastructure.Persistence;
+using CreateUserEnityInTheExistingDbContext.Infrastructure.Repositories;
 
-namespace CreateADotnetRepositoryWithCleanArchitecture.Infrastructure
+namespace CreateUserEnityInTheExistingDbContext.Infrastructure
 {
     public static class DependencyInjection
     {
@@ -11,8 +13,7 @@ namespace CreateADotnetRepositoryWithCleanArchitecture.Infrastructure
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddScoped<IRepository, Repository>();
-            services.AddScoped<IService, Service>();
+            services.AddScoped<IUserRepository, UserRepository>();
 
             return services;
         }

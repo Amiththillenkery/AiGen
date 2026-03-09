@@ -2,8 +2,10 @@ using System.Net;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using FluentValidation;
+using CreateUserEnityInTheExistingDbContext.Api.Exceptions;
 
-namespace CreateADotnetRepositoryWithCleanArchitecture.Api.Middleware
+namespace CreateUserEnityInTheExistingDbContext.Api.Middleware
 {
     public class GlobalExceptionMiddleware
     {
@@ -30,47 +32,40 @@ namespace CreateADotnetRepositoryWithCleanArchitecture.Api.Middleware
 
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
+            context.Response.ContentType = "application/json";
             var correlationId = context.TraceIdentifier;
-            var statusCode = HttpStatusCode.InternalServerError;
             var problemDetails = new ProblemDetails
             {
-                Type = "https://httpstatuses.com/500",
-                Title = "An unexpected error occurred!",
-                Status = (int)statusCode,
-                Detail = exception.Message,
                 Instance = context.Request.Path,
+                Title = "An error occurred while processing your request.",
+                Status = (int)HttpStatusCode.InternalServerError,
+                Detail = exception.Message,
                 Extensions = { { "correlationId", correlationId } }
             };
 
             switch (exception)
             {
                 case ValidationException validationException:
-                    statusCode = HttpStatusCode.BadRequest;
-                    problemDetails.Type = "https://httpstatuses.com/400";
+                    problemDetails.Status = (int)HttpStatusCode.BadRequest;
                     problemDetails.Title = "Validation error";
                     problemDetails.Detail = validationException.Message;
                     break;
-                case NotFoundException notFoundException:
-                    statusCode = HttpStatusCode.NotFound;
-                    problemDetails.Type = "https://httpstatuses.com/404";
+                case NotFoundException:
+                    problemDetails.Status = (int)HttpStatusCode.NotFound;
                     problemDetails.Title = "Resource not found";
-                    problemDetails.Detail = notFoundException.Message;
                     break;
-                case UnauthorizedAccessException unauthorizedAccessException:
-                    statusCode = HttpStatusCode.Unauthorized;
-                    problemDetails.Type = "https://httpstatuses.com/401";
+                case UnauthorizedAccessException:
+                    problemDetails.Status = (int)HttpStatusCode.Unauthorized;
                     problemDetails.Title = "Unauthorized access";
-                    problemDetails.Detail = unauthorizedAccessException.Message;
                     break;
                 default:
-                    _logger.LogError(exception, "An unhandled exception occurred. Correlation ID: {CorrelationId}", correlationId);
+                    _logger.LogError(exception, "Unhandled exception occurred. Correlation ID: {CorrelationId}", correlationId);
                     break;
             }
 
-            context.Response.ContentType = "application/json";
-            context.Response.StatusCode = (int)statusCode;
-            var result = JsonSerializer.Serialize(problemDetails);
-            await context.Response.WriteAsync(result);
+            context.Response.StatusCode = problemDetails.Status.Value;
+            var jsonResponse = JsonSerializer.Serialize(problemDetails);
+            await context.Response.WriteAsync(jsonResponse);
         }
     }
 }

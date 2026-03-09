@@ -1,6 +1,4 @@
-using System;
-
-namespace CreateADotnetRepositoryWithCleanArchitecture.Domain.Entities
+namespace CreateUserEnityInTheExistingDbContext.Domain.Entities
 {
     public abstract class BaseEntity
     {
@@ -8,13 +6,6 @@ namespace CreateADotnetRepositoryWithCleanArchitecture.Domain.Entities
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public bool IsDeleted { get; set; }
-
-        protected BaseEntity()
-        {
-            Id = Guid.NewGuid();
-            CreatedAt = DateTime.UtcNow;
-            IsDeleted = false;
-        }
 
         public void SoftDelete()
         {

@@ -1,4 +1,4 @@
-namespace CreateADotnetRepositoryWithCleanArchitecture.Application.DTOs
+namespace CreateUserEnityInTheExistingDbContext.Application.DTOs
 {
     public record BaseDto
     {
